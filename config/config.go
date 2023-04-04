@@ -12,6 +12,7 @@ type AppConfig struct {
 	MONGO_URI   string
 	DATABASE    string
 	API_VERSION string
+	COLLECTION  string
 	PORT        int
 	GIN_MODE    string
 }
@@ -25,6 +26,7 @@ func InitAppConfig() *AppConfig {
 
 		MONGO_URI:   os.Getenv("MONGO_URI"),
 		DATABASE:    os.Getenv("DATABASE"),
+		COLLECTION:  os.Getenv("COLLECTION"),
 		API_VERSION: os.Getenv("API_VERSION"),
 		GIN_MODE:    os.Getenv("GIN_MODE"),
 		PORT: func() int {

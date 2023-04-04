@@ -2,7 +2,8 @@ package main
 
 import (
 	"AppServer/config"
-	"AppServer/services/user"
+	Todo "AppServer/services/todo"
+
 	"context"
 	"fmt"
 
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	engineConfig := config.InitAppConfig()
-	mongoClient, mongoClientError := mongo.Connect(context.Background(), options.Client().ApplyURI(
+	mongoClient, mongoClientError := mongo.Connect(context.TODO(), options.Client().ApplyURI(
 		fmt.Sprintf("%s/%s", engineConfig.MONGO_URI, engineConfig.DATABASE),
 	))
 	fmt.Printf("%s/%s", engineConfig.MONGO_URI, engineConfig.DATABASE)
@@ -22,7 +23,7 @@ func main() {
 		panic(mongoClientError)
 	}
 	defer func() {
-		if err := mongoClient.Disconnect(context.Background()); err != nil {
+		if err := mongoClient.Disconnect(context.TODO()); err != nil {
 			panic(err)
 		}
 	}()
@@ -30,14 +31,16 @@ func main() {
 	engine := gin.Default()
 	engine.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"*"},
 		AllowCredentials: true,
 	}))
 
-	user.UserController{
-		UserService: &user.UserService{
+	Todo.TodoController{
+		TodoService: &Todo.TodoService{
 			MongoContext: mongoClient,
+			DATABASE:     engineConfig.DATABASE,
+			COLLECTION:   engineConfig.COLLECTION,
 		},
 	}.RegisterController(engine)
 
